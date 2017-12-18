@@ -1,0 +1,115 @@
+﻿@model MyExercise.Models.ViewModels.ExerciseVM
+@using PagedList.Mvc;
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    //var pagedlist = (PagedList.IPagedList)Model;
+    var pagedlist = (PagedList.IPagedList)Model.ExePagedList;
+}
+<link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/bootstrap.min.js"></script>
+<script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+@*<form id="searchform">
+    <p>
+        Exercise Name: @Html.TextBox("SearchString", ViewBag.CurrentFilter as string)
+        <input type="submit" value="Search" />
+    </p>
+</form>*@
+<div id="searchTar">
+    <h2>Competition 1</h2>
+    @using (Ajax.BeginForm("Index", "Exercise", new AjaxOptions()
+    {
+        InsertionMode = InsertionMode.Replace,
+        HttpMethod = "GET",
+        UpdateTargetId = "searchTar"
+    }))
+    {
+        <p>
+            Exercise Name: @Html.TextBox("SearchString", ViewBag.CurrentFilter as string)
+            <input type="submit" value="Search" />
+        </p>
+    }
+
+    <button type="button" class="btn btn-primary btn-default" data-toggle="modal" data-target="#myModal1">
+        Create Exercise
+    </button>
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ExerciseRecord.ExerciseName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExerciseRecord.ExerciseDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ExerciseRecord.DurationInMinutes)
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model.ExePagedList)
+            {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ExerciseName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ExerciseDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DurationInMinutes)
+                </td>
+
+                @*<td>
+                        @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                        @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                    </td>*@
+            </tr>
+        }
+
+    </table>
+
+    <div class="panel-footer">
+        Page @(pagedlist.PageCount < pagedlist.PageNumber ? 0 : pagedlist.PageNumber) of @pagedlist.PageCount
+
+
+        @Html.PagedListPager(pagedlist, page => Url.Action("Index",
+                new { page, sortOrder = ViewBag.CurrentSort, currentFilter = ViewBag.CurrentFilter }))
+    </div>
+</div> <!-- searchTar -->
+@using (Ajax.BeginForm("Index", "Exercise", new AjaxOptions()
+                                                        {
+                                                            HttpMethod = "POST"
+                                                            ,UpdateTargetId = "myModalBodyDiv1"
+                                                            ,OnSuccess = "OnSuccess"
+                                                        }
+                                                        , new { id = "myForm" }
+                                                        ))
+
+{
+    <div class="modal fade" id="myModal1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <a href="#" class="close" data-dismiss="modal">&times;</a>
+                    <h3 class="modal-title">Create Exercise</h3>
+                </div>
+                <div class="modal-body" id="myModalBodyDiv1">
+                    @Html.Partial("_CreateExe")
+                </div>
+                <div class="modal-footer">
+                    <button data-dismiss="modal" id="btn-cancel" class="btn btn-default" type="button" >Cancel</button>
+                    <button class="btn btn-success" id="btn-submit" type="submit">
+                        Submit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script src="~/Scripts/exercise/exercise.js"></script>
